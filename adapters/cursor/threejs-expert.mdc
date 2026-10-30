@@ -1,0 +1,49 @@
+---
+description: "Production Three.js 3D standards, version r186+ APIs, GPU disposal, and framework guardrails"
+globs: "**/*.{js,jsx,ts,tsx,html}"
+alwaysApply: false
+---
+
+# Three.js Expert Rules (Cursor)
+
+Apply these rules when creating, modifying, or debugging Three.js 3D web experiences.
+
+---
+
+## 1. Mandatory Pre-Flight Audit
+Before suggesting or writing 3D code:
+1. Inspect `package.json` for installed `three` version and framework (`@react-three/fiber`, `next`, `vite`, vanilla).
+2. Never mix paradigms:
+   - Do NOT instantiate `new THREE.WebGLRenderer()` or bare `requestAnimationFrame` loops inside React Three Fiber components.
+   - For Next.js, isolate Three.js in Client Components with dynamic imports (`ssr: false`).
+3. Preserve existing infrastructure (canvas wrappers, camera controls, resize observers).
+
+---
+
+## 2. Three.js r186+ Standards & Invariants
+- **Shadow Maps**: Use `THREE.PCFShadowMap` (`PCFSoftShadowMap` is deprecated in r186+).
+- **HDR Environment**: Use `HDRLoader` from `'three/addons/loaders/HDRLoader.js'` (`RGBELoader` is deprecated in r180+).
+- **WebGPU Post-Processing**: Use `new THREE.RenderPipeline()` (formerly `PostProcessing`).
+- **WebGPU Initialization**: Always `await renderer.init()` before the first render call.
+- **Color Spaces**: Set `texture.colorSpace = THREE.SRGBColorSpace` for color maps; keep data maps linear.
+- **Pixel Ratio**: Always clamp DPR: `renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))`.
+- **Tone Mapping**: Use `THREE.ACESFilmicToneMapping` with exposure `1.0`.
+
+---
+
+## 3. Lifecycle, Performance & Accessibility
+- **Resource Disposal**: Reclaim GPU memory by recursively traversing meshes and disposing geometries, materials, and textures on unmount.
+- **Resize Observer**: Use container-based `ResizeObserver` with a zero-dimension guard (`width === 0 || height === 0`).
+- **Animation Loop**: Always store and cancel animation frame handles or use `renderer.setAnimationLoop(null)`.
+- **Accessibility**: Provide keyboard controls, canvas fallback descriptions, and honor `prefers-reduced-motion`.
+- **Code Execution**: Test implementations where possible. State honestly when code has not been executed in a live browser.
+
+---
+
+## 4. Canonical References & Blueprints
+For full reference implementations, see:
+- Core Patterns: `threejs-expert/core/implementation-patterns.md`
+- Decision Guide: `threejs-expert/references/decision-guide.md`
+- GLTF Safe Loader: `threejs-expert/examples/gltf-loader-safe.js`
+- Memory Disposal: `threejs-expert/references/disposal-guide.md`
+- Diagnostics Matrix: `threejs-expert/references/troubleshooting-matrix.md`

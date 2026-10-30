@@ -1,0 +1,41 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary build & simulation directories
+temp_build/
+temp_test/
+*.tmp
+
+# Dynamic run-specific reports and runtime outputs
+reports/latest.json
+reports/latest.md
+reports/proposals/
+reports/
+
+# Generator scaffolding and backup files
+scripts/backup_original/
+scripts/build_examples_and_skill.py
+scripts/build_references.py
+scripts/build_skill_phase2.py
+scripts/write_examples.py
+scripts/write_framework_det.py
+scripts/write_references.py
+scripts/GENERATORS_GUIDE.md

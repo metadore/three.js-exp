@@ -1,0 +1,20 @@
+# Three.js Troubleshooting Diagnostic Matrix
+
+A structured diagnostic reference for identifying and fixing common runtime failures in Three.js applications.
+
+---
+
+## Master Diagnostic Matrix
+
+| Failure Symptom | Likely Root Cause | Verification & Diagnostic Step | Definitive Resolution |
+| :--- | :--- | :--- | :--- |
+| **Black Screen / Blank Canvas** | 1. Container height is 0px.<br>2. Camera inside mesh or looking away.<br>3. PBR material without lights.<br>4. WebGPU not initialized. | - Inspect element in DevTools: is `canvas.clientHeight === 0`?<br>- Log `camera.position` and `scene.children`.<br>- Temporarily add `scene.add(new THREE.AmbientLight(0xffffff, 2))` or swap to `MeshBasicMaterial`.<br>- If WebGPU: did you call `await renderer.init()`? | - Set CSS `height: 100vh` or fixed pixel height on parent.<br>- Move camera: `camera.position.set(0, 2, 5); camera.lookAt(0, 0, 0)`.<br>- Add directional and ambient lighting.<br>- Await `renderer.init()` before rendering. |
+| **Missing or Displaced GLTF Model** | Model exported with extreme scale (e.g. 0.0001 or 50000) or offset from world origin in Blender. | Compute bounding box:<br>`const box = new THREE.Box3().setFromObject(model);`<br>`console.log(box.getSize(new THREE.Vector3()));` | Auto-scale and center the model using `Box3` (see `examples/gltf-loader-safe.js`), or reposition camera to encompass bounding sphere. |
+| **404 / Broken Asset Path** | 1. Relative path breaks under nested client routes.<br>2. Assets in `public/` referenced with `./public/...`. | Check Network tab in DevTools for 404 status code. | Use root-relative URLs: `/models/robot.glb`. In Vite and Next.js, static files in `public/` are served at `/`. |
+| **Washed-Out / Muddy Textures** | Color space mismatch. sRGB applied to data texture or linear space applied to color map. | Check `texture.colorSpace`. | For diffuse/albedo: `texture.colorSpace = THREE.SRGBColorSpace`. For normal, roughness, metalness: keep `LinearSRGBColorSpace` / `NoColorSpace`. |
+| **Shadow Acne (Stripes) or Peter-Panning (Detached Shadows)** | 1. Self-shadowing precision artifacts.<br>2. Shadow bias too negative. | Zoom in on shadow contact point. If striped: acne. If floating: peter-panning. | Set `light.shadow.bias = -0.0005` and `light.shadow.normalBias = 0.02`. Adjust based on light frustum. |
+| **GLTF Animation Not Playing** | 1. `AnimationMixer` not created.<br>2. `mixer.update(delta)` omitted from loop. | Log `gltf.animations` and verify array length > 0. Verify mixer clock is ticking. | Instantiate `new THREE.AnimationMixer(model)`, call `mixer.clipAction(clip).play()`, and call `mixer.update(clock.getDelta())` in `setAnimationLoop`. |
+| **WebGPU Init Error / Pipeline Crash** | Browser lacks WebGPU support or async init omitted. | Check console for `navigator.gpu` undefined or pipeline compilation errors. | Check `navigator.gpu` before instantiating `WebGPURenderer`. Fall back to `WebGLRenderer`. Always `await renderer.init()`. |
+| **WebGL Context Lost (`CONTEXT_LOST_WEBGL`)** | 1. Exceeded browser hardware limit for concurrent WebGL contexts (usually 8-16).<br>2. Unreleased GPU memory on route navigation. | Check console for `WARNING: Too many active WebGL contexts`. | Always call `.dispose()` on renderer, textures, and geometries when unmounting components. Reuse a single shared canvas when possible. |
+| **Severe Framerate Drops (<30 FPS)** | 1. Too many draw calls (>200).<br>2. DPR not clamped on mobile (rendering 4K).<br>3. Expensive post-processing. | Log `renderer.info.render.calls` and `renderer.info.render.triangles`. | Clamp DPR: `Math.min(window.devicePixelRatio, 2)`. Use `InstancedMesh` for repeated objects. Downscale post-processing passes. |
+| **Next.js SSR Crash (`window is not defined`)** | Three.js loaded during Node.js server-side rendering pass. | Check error stack trace pointing to `window`, `document`, or `navigator` in server logs. | Add `'use client';` to component and load via `dynamic(() => import('./Canvas'), { ssr: false })` or instantiate inside `useEffect()`. |

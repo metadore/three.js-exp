@@ -1,0 +1,6 @@
+# Developer & Testing Requirements for threejs-expert
+# Python >= 3.10 required
+
+pytest>=7.4.0,<9.0.0
+pytest-asyncio>=0.21.0
+

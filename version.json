@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "manifest_version": "1.0.0",
+  "declared_target": {
+    "version": "0.186.0",
+    "revision": "187dev",
+    "revision_status": "RECORDED_CLAIM_NOT_INDEPENDENTLY_REVERIFIED",
+    "is_latest_claimed": false,
+    "supported_range": null,
+    "range_evidence_status": "UNVERIFIED",
+    "declarations_in_knowledge_base": [
+      "README.md",
+      "core/api-version-compatibility.md",
+      "adapters/antigravity/SKILL.md",
+      "adapters/claude-code/CLAUDE.md",
+      "adapters/copilot/copilot-instructions.md",
+      "adapters/windsurf/threejs-expert.md",
+      "references/framework-vanilla.md"
+    ]
+  },
+  "verification": {
+    "last_verified_date": "2026-10-30",
+    "overall_status": "CONFIRMED_LOCAL_SOURCE",
+    "verification_sources": [
+      {
+        "source_id": "local_threejs_repo",
+        "type": "local_source_repository",
+        "path": "three.js-dev/three.js-dev",
+        "version_found": "0.186.0",
+        "verified_date": "2026-10-30",
+        "evidence_status": "CONFIRMED_LOCAL_SOURCE"
+      }
+    ]
+  },
+  "compatibility_claims": [
+    {
+      "claim_id": "CLAIM-SHADOW-PCF-R186",
+      "affected_api": "THREE.PCFSoftShadowMap",
+      "recommended_api": "THREE.PCFShadowMap",
+      "target_version": "0.186.0",
+      "evidence_status": "CONFIRMED_LOCAL_SOURCE",
+      "source_reference": "three.js-dev/src/constants.js:73; src/renderers/webgl/WebGLShadowMap.js:99; src/renderers/common/Renderer.js:990",
+      "verification_date": "2026-10-30",
+      "description": "PCFSoftShadowMap is marked @deprecated in constants.js:73 and actively intercepted with a removal warning in WebGL and WebGPU renderers, falling back to PCFShadowMap.",
+      "notes": "Code using PCFSoftShadowMap emits console warnings in browser runtime and is coerced to PCFShadowMap."
+    },
+    {
+      "claim_id": "CLAIM-LOADER-HDR-R180",
+      "affected_api": "RGBELoader",
+      "recommended_api": "HDRLoader",
+      "target_version": "0.186.0",
+      "evidence_status": "CONFIRMED_LOCAL_SOURCE",
+      "source_reference": "three.js-dev/examples/jsm/loaders/RGBELoader.js:8",
+      "verification_date": "2026-10-30",
+      "description": "RGBELoader extends HDRLoader and emits deprecation warning recommending HDRLoader.",
+      "notes": "Addon loader transition introduced in r180."
+    },
+    {
+      "claim_id": "CLAIM-WEBGPU-RENDERPIPELINE-R183",
+      "affected_api": "PostProcessing",
+      "recommended_api": "RenderPipeline",
+      "target_version": "0.186.0",
+      "evidence_status": "CONFIRMED_LOCAL_SOURCE",
+      "source_reference": "three.js-dev/src/renderers/common/PostProcessing.js:4",
+      "verification_date": "2026-10-30",
+      "description": "PostProcessing is deprecated in favor of RenderPipeline for WebGPU pass composition.",
+      "notes": "Emits warnOnce in WebGPU environments."
+    },
+    {
+      "claim_id": "CLAIM-COLORSPACE-SRGB-R152",
+      "affected_api": "sRGBEncoding",
+      "recommended_api": "THREE.SRGBColorSpace",
+      "target_version": "0.186.0",
+      "evidence_status": "CONFIRMED_LOCAL_SOURCE",
+      "source_reference": "three.js-dev/src/constants.js:1301",
+      "verification_date": "2026-10-30",
+      "description": "sRGBEncoding was replaced by SRGBColorSpace constant in r152. Constants export confirms SRGBColorSpace and absence of legacy encoding constants.",
+      "notes": "Legacy encoding constants are completely absent from constants.js."
+    },
+    {
+      "claim_id": "CLAIM-COLORSPACE-OUTPUT-R152",
+      "affected_api": "outputEncoding",
+      "recommended_api": "outputColorSpace",
+      "target_version": "0.186.0",
+      "evidence_status": "CONFIRMED_LOCAL_SOURCE",
+      "source_reference": "three.js-dev/src/renderers/WebGLRenderer.js:3696",
+      "verification_date": "2026-10-30",
+      "description": "renderer.outputEncoding was replaced by renderer.outputColorSpace in r152. WebGLRenderer confirms getter/setter outputColorSpace and absence of outputEncoding.",
+      "notes": "Legacy outputEncoding property is completely removed."
+    },
+    {
+      "claim_id": "CLAIM-GEOMETRY-BUFFERGEOMETRY-R125",
+      "affected_api": "THREE.Geometry",
+      "recommended_api": "THREE.BufferGeometry",
+      "target_version": "0.186.0",
+      "evidence_status": "CONFIRMED_LOCAL_SOURCE",
+      "source_reference": "three.js-dev/src/core/BufferGeometry.js:1",
+      "verification_date": "2026-10-30",
+      "description": "THREE.Geometry was removed in r125; all meshes must use BufferGeometry. BufferGeometry.js confirms standard representation and absence of legacy Geometry.",
+      "notes": "Legacy Geometry class is completely absent from core."
+    }
+  ],
+  "known_limitations": [
+    "Multi-version backwards compatibility range (<0.180.0) is not verified by automated test fixtures.",
+    "Revision 187dev is a recorded claim from initial repository setup and has not been independently reverified from Git commit history.",
+    "WebGPU runtime rendering and TSL shader execution require a WebGPU-compatible GPU and browser context."
+  ]
+}
